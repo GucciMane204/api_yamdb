@@ -4,6 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 from .validators import validate_year
 
+
 class Category(models.Model):
     name = models.CharField(
         verbose_name='Название',
@@ -142,3 +143,17 @@ class Review(models.Model):
                 name='unique_review'
             ),
         ]
+
+
+class Comment(models.Model):
+    review = models.ForeignKey(
+        Review,
+        verbose_name='Комментарии',
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True)
