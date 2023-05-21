@@ -62,4 +62,3 @@ Gucci_Mane (TeamLead) - Auth/Users
 ShubinGrigorii - Review/Comments
 
 IEIVAN - Categories/Genres/Titles
-=======
