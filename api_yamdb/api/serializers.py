@@ -8,7 +8,7 @@ from rest_framework.serializers import (
     SlugRelatedField,
     ValidationError,
 )
-
+from users.models import User
 from reviews.models import (
     Category,
     Comment,
@@ -16,7 +16,6 @@ from reviews.models import (
     GenreTitle,
     Review,
     Title,
-    User,
 )
 
 
@@ -39,7 +38,9 @@ class TitleSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        )
 
 
 class TitleCreateUpdateSerializer(ModelSerializer):
@@ -56,7 +57,7 @@ class TitleCreateUpdateSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         read_only_fields = ('rating',)
 
     def create(self, validated_data):

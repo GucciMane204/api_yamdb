@@ -5,7 +5,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.tokens import AccessToken
@@ -32,10 +31,8 @@ from api.serializers import (
     TokenSerializer,
     UserSerializer,
 )
-from reviews.models import Category, Genre, Review, Title, User
-
-
-HTTP_METHOD = ('get', 'post', 'patch', 'delete')
+from users.models import User
+from reviews.models import Category, Genre, Review, Title
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -45,7 +42,7 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
     pagination_class = PageNumberPagination
-    http_method_names = HTTP_METHOD
+    http_method_names = ('get', 'post', 'patch', 'delete')
     lookup_field = 'username'
 
     @action(
@@ -55,19 +52,13 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,),
     )
     def me(self, request):
+        serializer = self.get_serializer(
+            request.user, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
         if request.method == 'PATCH':
-            serializer = self.get_serializer(
-                request.user, data=request.data, partial=True
-            )
-            try:
-                serializer.is_valid(raise_exception=True)
-            except ValidationError as e:
-                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
+            serializer.save(raise_exception=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SignUPView(APIView):
@@ -138,7 +129,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = [ReadOnly | AdminRules]
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
-    http_method_names = HTTP_METHOD
+    http_method_names = ('get', 'post', 'patch', 'delete')
     filterset_class = TitlesFilter
     ordering = ('id',)
 
@@ -155,7 +146,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         AccessOrReadOnly,
     )
     pagination_class = PageNumberPagination
-    http_method_names = HTTP_METHOD
+    http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (filters.OrderingFilter,)
     ordering = ('id',)
 
@@ -175,7 +166,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         AccessOrReadOnly,
     )
     pagination_class = PageNumberPagination
-    http_method_names = HTTP_METHOD
+    http_method_names = ('get', 'post', 'patch', 'delete')
     filter_backends = (filters.OrderingFilter,)
     ordering = ('id',)
 
