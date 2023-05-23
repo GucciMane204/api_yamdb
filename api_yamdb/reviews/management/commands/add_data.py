@@ -4,9 +4,9 @@ import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
+from users.models import User
 from reviews.models import (
     Title,
-    User,
     Category,
     Genre,
     Review,
