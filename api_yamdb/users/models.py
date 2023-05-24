@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import RegexValidator
-from django.core.management.utils import get_random_secret_key
 
 
 class User(AbstractUser):
@@ -33,7 +32,6 @@ class User(AbstractUser):
         max_length=30, choices=USER_ROLES, default=USER, verbose_name='Роль'
     )
     bio = models.TextField(blank=True, verbose_name='О себе')
-    confirmation_code = get_random_secret_key
 
     class Meta:
         verbose_name = 'Пользователь'

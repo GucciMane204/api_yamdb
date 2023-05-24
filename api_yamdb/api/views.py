@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.mail import send_mail
+from django.core.management.utils import get_random_secret_key
 from django.db.models import Avg
-from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -66,10 +66,7 @@ class SignUPView(APIView):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        confirmation_code = default_token_generator.make_token(user)
-        user.confirmation_code = (
-            confirmation_code
-        )
+        confirmation_code = (get_random_secret_key)
         user.save()
         send_mail(
             subject='Confirmation code',
@@ -88,7 +85,7 @@ class TokenView(APIView):
         username = serializer.validated_data.get('username')
         confirmation_code = serializer.validated_data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
-        if user.confirmation_code == confirmation_code:
+        if confirmation_code == get_random_secret_key:
             jwt_token = AccessToken.for_user(user)
             return Response(
                 {'token': f'{jwt_token}'}, status=status.HTTP_200_OK
